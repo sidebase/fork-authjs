@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": false,
+    "outDir": ".",
+    "rootDir": "src",
+    "module": "esnext",
+    "target": "es2019",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "isolatedModules": false,
+    "sourceMap": false,
+    "noEmitOnError": true
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "./*.js",
+    "./*.d.ts",
+    "./config",
+    "./tests",
+    "./coverage",
+    "./**/__test__"
+  ]
+}

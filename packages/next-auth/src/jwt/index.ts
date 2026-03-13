@@ -1,13 +1,11 @@
 import { EncryptJWT, jwtDecrypt } from "jose"
-import hkdf from "@panva/hkdf"
-import { v4 as uuid } from "uuid"
+import { hkdf, randomUUID } from "node:crypto"
+import { IncomingHttpHeaders } from "node:http"
 import { SessionStore } from "../core/lib/cookie"
-import type { GetServerSidePropsContext, NextApiRequest } from "next"
-import type { NextRequest } from "next/server"
 import type { JWT, JWTDecodeParams, JWTEncodeParams, JWTOptions } from "./types"
 import type { LoggerInstance } from ".."
 
-export * from "./types"
+export type { DefaultJWT, JWT, JWTDecodeParams, JWTEncodeParams, JWTOptions, Secret } from "./types"
 
 const DEFAULT_MAX_AGE = 30 * 24 * 60 * 60 // 30 days
 
@@ -17,12 +15,13 @@ const now = () => (Date.now() / 1000) | 0
 export async function encode(params: JWTEncodeParams) {
   /** @note empty `salt` means a session token. See {@link JWTEncodeParams.salt}. */
   const { token = {}, secret, maxAge = DEFAULT_MAX_AGE, salt = "" } = params
+
   const encryptionSecret = await getDerivedEncryptionKey(secret, salt)
   return await new EncryptJWT(token)
     .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
     .setIssuedAt()
     .setExpirationTime(now() + maxAge)
-    .setJti(uuid())
+    .setJti(randomUUID())
     .encrypt(encryptionSecret)
 }
 
@@ -40,7 +39,10 @@ export async function decode(params: JWTDecodeParams): Promise<JWT | null> {
 
 export interface GetTokenParams<R extends boolean = false> {
   /** The request containing the JWT either in the cookies or in the `Authorization` header. */
-  req: GetServerSidePropsContext["req"] | NextRequest | NextApiRequest
+  req: {
+    cookies: Record<string, string>
+    headers: IncomingHttpHeaders
+  }
   /**
    * Use secure prefix for cookie name, unless URL in `NEXTAUTH_URL` is http://
    * or not set (e.g. development or test instance) case use unprefixed name
@@ -118,15 +120,51 @@ export async function getToken<R extends boolean = false>(
   }
 }
 
+/**
+ * Derives HKDF key
+ * @see https://github.com/panva/hkdf/blob/22c5263267bc2c38e1a2ac72f484ab3c20eddce7/README.md?plain=1#L1-L21
+ * @see https://github.com/nextauthjs/next-auth/blob/1a70ee8e3b9ed5be5446a221c133bc8d26157a3f/packages/next-auth/src/jwt/index.ts#L121-L132
+ */
 async function getDerivedEncryptionKey(
   keyMaterial: string | Buffer,
-  salt: string
+  inputSalt: string,
 ) {
-  return await hkdf(
-    "sha256",
-    keyMaterial,
-    salt,
-    `NextAuth.js Generated Encryption Key${salt ? ` (${salt})` : ""}`,
-    32
-  )
+  const ikm = normalizeIkm(keyMaterial)
+  const salt = normalizeUint8Array(inputSalt, 'salt')
+  const info = normalizeInfo(`NextAuth.js Generated Encryption Key${salt ? ` (${salt})` : ""}`)
+  const keylen = 32 // 256 >> 3
+
+  return await new Promise<Uint8Array>((resolve, reject) => {
+    hkdf('sha256', ikm, salt, info, keylen, (err, derivedKey) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(new Uint8Array(derivedKey))
+      }
+    })
+  })
+}
+function normalizeUint8Array(input: string | Buffer, label: string) {
+    if (typeof input === 'string') {
+        return new TextEncoder().encode(input)
+    }
+    if (!(input instanceof Uint8Array)) {
+        throw new TypeError(`"${label}"" must be an instance of Uint8Array or a string`)
+    }
+    return input
+}
+
+function normalizeIkm(input: string | Buffer): Uint8Array {
+    const ikm = normalizeUint8Array(input, 'ikm')
+    if (!ikm.byteLength) {
+        throw new TypeError(`"ikm" must be at least one byte in length`)
+    }
+    return ikm
+}
+function normalizeInfo(input: string) {
+    const info = normalizeUint8Array(input, 'info');
+    if (info.byteLength > 1024) {
+        throw TypeError('"info" must not contain more than 1024 bytes')
+    }
+    return info
 }
