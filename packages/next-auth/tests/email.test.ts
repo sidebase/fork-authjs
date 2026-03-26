@@ -40,14 +40,15 @@ it("Send e-mail to the only address correctly", async () => {
   )
 })
 
-it("Send e-mail to first address only", async () => {
+it("Does not allow multiple addresses", async () => {
   const { secret, csrf } = await createCSRF()
   const sendVerificationRequest = jest.fn()
   const signIn = jest.fn(() => true)
 
   const firstEmail = "email@email.com"
   const email = `${firstEmail},email@email2.com`
-  const { res } = await handler(
+  const error = new Error("Invalid email address format.")
+  const { res, log } = await handler(
     {
       adapter: mockAdapter(),
       providers: [EmailProvider({ sendVerificationRequest })],
@@ -64,19 +65,17 @@ it("Send e-mail to first address only", async () => {
     }
   )
 
+  expect(signIn).toBeCalledTimes(0)
+  expect(sendVerificationRequest).toBeCalledTimes(0)
+
+  // @ts-expect-error
+  expect(log.error.mock.calls[0]).toEqual([
+    "SIGNIN_EMAIL_ERROR",
+    { error, providerId: "email" },
+  ])
+
   expect(res.redirect).toBe(
-    "http://localhost:3000/api/auth/verify-request?provider=email&type=email"
-  )
-
-  expect(signIn).toBeCalledTimes(1)
-  expect(signIn).toHaveBeenCalledWith(
-    expect.objectContaining({
-      user: expect.objectContaining({ email: firstEmail }),
-    })
-  )
-
-  expect(sendVerificationRequest).toHaveBeenCalledWith(
-    expect.objectContaining({ identifier: firstEmail })
+    "http://localhost:3000/api/auth/error?error=EmailSignin"
   )
 })
 

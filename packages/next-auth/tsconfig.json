@@ -1,6 +1,10 @@
 {
-  "extends": "@next-auth/tsconfig/tsconfig.base.json",
   "compilerOptions": {
+    "target": "esnext",
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "skipLibCheck": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "strictNullChecks": true,
