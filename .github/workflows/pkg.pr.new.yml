@@ -26,7 +26,7 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+          cache_dependency_path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Use Node.js ${{ env.NODE_VER }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
