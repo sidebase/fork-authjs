@@ -14,7 +14,7 @@ env:
 
 defaults:
   run:
-    working-directory: ${{ env.WORKING_DIR }}
+    working-directory: packages/next-auth
 
 jobs:
   build:
