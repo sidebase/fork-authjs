@@ -1,0 +1,46 @@
+name: Publish Commit
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '!**'
+  pull_request:
+
+env:
+  # NODE_VER: 24.14
+  NODE_VER: 18.20
+  WORKING_DIR: packages/next-auth
+
+defaults:
+  run:
+    working-directory: ${{ env.WORKING_DIR }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+        name: Install pnpm
+        with:
+          run_install: false
+          # cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+
+      - name: Use Node.js ${{ env.NODE_VER }}
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version: ${{ env.NODE_VER }}
+          cache: pnpm
+          # cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+
+      - name: Install deps
+        run: pnpm i
+
+      # - name: Build and pack
+      #   run: pnpm prepack
+
+      # - name: Publish package preview
+      #   run: pnpx pkg-pr-new publish --compact
