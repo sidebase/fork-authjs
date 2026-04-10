@@ -1,9 +1,9 @@
 {
-  "name": "next-auth",
+  "name": "@sidebase/fork-authjs",
   "version": "4.24.13",
-  "description": "Authentication for Next.js",
+  "description": "Authentication for Nuxt",
   "homepage": "https://authjs.dev",
-  "repository": "https://github.com/nextauthjs/next-auth.git",
+  "repository": "https://github.com/sidebase/fork-authjs.git",
   "author": "Iain Collins <me@iaincollins.com>",
   "contributors": [
     "Balázs Orbán <info@balazsorban.com>",
