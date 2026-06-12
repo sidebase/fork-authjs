@@ -11,6 +11,14 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  NODE_VER: 24.14
+  WORKING_DIR: packages/next-auth
+
+defaults:
+  run:
+    working-directory: packages/next-auth
+
 jobs:
   test:
     name: Test
@@ -20,14 +28,22 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 2
+
       - name: Install pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+        with:
+          run_install: false
+          cache_dependency_path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+
       - name: Setup Node
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VER }}
           cache: pnpm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm i --frozen-lockfile
+
       - name: Build
         run: pnpm build

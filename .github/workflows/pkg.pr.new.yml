@@ -35,7 +35,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
-      - name: Install deps
+      - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
       - name: Build and pack
