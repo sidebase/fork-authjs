@@ -36,10 +36,10 @@ jobs:
           cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Install deps
-        run: pnpm i
+        run: pnpm i --frozen-lockfile
 
       - name: Build and pack
         run: pnpm build
 
       - name: Publish package preview
-        run: pnpx pkg-pr-new publish --compact --packageManager=npm,pnpm,yarn
+        run: pnpm exec pkg-pr-new publish --compact --packageManager=npm,pnpm,yarn

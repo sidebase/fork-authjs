@@ -38,6 +38,10 @@
       "types": "./core/index.d.ts",
       "default": "./core/index.js"
     },
+    "./css": {
+      "types": "./css/index.d.ts",
+      "default": "./css/index.js"
+    },
     "./jwt": {
       "types": "./jwt/index.d.ts",
       "default": "./jwt/index.js"
@@ -116,6 +120,7 @@
     "jest-environment-jsdom": "^30.3.0",
     "jest-watch-typeahead": "^1.1.0",
     "msw": "^2.12.10",
+    "pkg-pr-new": "^0.0.75",
     "postcss": "^8.4.14",
     "postcss-cli": "^9.1.0",
     "postcss-nested": "^5.0.6",
