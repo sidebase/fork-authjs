@@ -131,7 +131,7 @@ async function getDerivedEncryptionKey(
 ) {
   const ikm = normalizeIkm(keyMaterial)
   const salt = normalizeUint8Array(inputSalt, 'salt')
-  const info = normalizeInfo(`NextAuth.js Generated Encryption Key${salt ? ` (${salt})` : ""}`)
+  const info = normalizeInfo(`NextAuth.js Generated Encryption Key${inputSalt ? ` (${inputSalt})` : ""}`)
   const keylen = 32 // 256 >> 3
 
   return await new Promise<Uint8Array>((resolve, reject) => {
