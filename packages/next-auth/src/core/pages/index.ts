@@ -4,7 +4,7 @@ import SigninPage from "./signin"
 import SignoutPage from "./signout"
 import VerifyRequestPage from "./verify-request"
 import ErrorPage from "./error"
-import css from "../../css/index.js"
+import css from "../../css"
 
 import type { InternalOptions } from "../types"
 import type { RequestInternal, ResponseInternal } from ".."
