@@ -46,10 +46,6 @@
       "types": "./jwt/index.d.ts",
       "default": "./jwt/index.js"
     },
-    "./client/_utils": {
-      "types": "./client/_utils.d.ts",
-      "default": "./client/_utils.js"
-    },
     "./providers/*": {
       "types": "./providers/*.d.ts",
       "default": "./providers/*.js"
