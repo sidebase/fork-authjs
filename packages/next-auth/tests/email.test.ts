@@ -40,13 +40,15 @@ it("Send e-mail to the only address correctly", async () => {
   )
 })
 
-it("Does not allow multiple addresses", async () => {
+it("Reject an address list containing multiple `@` symbols", async () => {
   const { secret, csrf } = await createCSRF()
   const sendVerificationRequest = jest.fn()
   const signIn = jest.fn(() => true)
 
-  const firstEmail = "email@email.com"
-  const email = `${firstEmail},email@email2.com`
+  // Two real `@` symbols (one per address) must be rejected rather than
+  // silently delivering the magic link to the first address, which would let
+  // an attacker smuggle a second recipient past the single-`@` check.
+  const email = "email@email.com,email@email2.com"
   const error = new Error("Invalid email address format.")
   const { res, log } = await handler(
     {
@@ -67,16 +69,15 @@ it("Does not allow multiple addresses", async () => {
 
   expect(signIn).toBeCalledTimes(0)
   expect(sendVerificationRequest).toBeCalledTimes(0)
+  expect(res.redirect).toBe(
+    "http://localhost:3000/api/auth/error?error=EmailSignin"
+  )
 
   // @ts-expect-error
   expect(log.error.mock.calls[0]).toEqual([
     "SIGNIN_EMAIL_ERROR",
     { error, providerId: "email" },
   ])
-
-  expect(res.redirect).toBe(
-    "http://localhost:3000/api/auth/error?error=EmailSignin"
-  )
 })
 
 it("Send e-mail to address with first domain", async () => {
