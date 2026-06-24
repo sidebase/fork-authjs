@@ -86,7 +86,7 @@
     "openid-client": "^5.4.0"
   },
   "peerDependencies": {
-    "nodemailer": "^8.0.9 || ^9.0.0"
+    "nodemailer": "^9.0.1"
   },
   "peerDependenciesMeta": {
     "nodemailer": {
