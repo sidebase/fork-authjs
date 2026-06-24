@@ -1,5 +1,4 @@
 import { Account, User, Awaitable } from "."
-import type { Adapter as FutureAdapter } from "./futureAdapter"
 
 export interface AdapterUser extends User {
   id: string
@@ -60,47 +59,53 @@ export interface VerificationToken {
  * [Adapters Overview](https://next-auth.js.org/adapters/overview) |
  * [Create a custom adapter](https://next-auth.js.org/tutorials/creating-a-database-adapter)
  */
-export interface Adapter {
-  createUser?:
-    | FutureAdapter["createUser"]
-    | ((user: Omit<AdapterUser, "id">) => Awaitable<AdapterUser>)
-  getUser?: (id: string) => Awaitable<AdapterUser | null>
-  getUserByEmail?: (email: string) => Awaitable<AdapterUser | null>
+export type Adapter<WithVerificationToken = boolean> = DefaultAdapter &
+  (WithVerificationToken extends true
+    ? {
+        createVerificationToken: (
+          verificationToken: VerificationToken
+        ) => Awaitable<VerificationToken | null | undefined>
+        /**
+         * Return verification token from the database
+         * and delete it so it cannot be used again.
+         */
+        useVerificationToken: (params: {
+          identifier: string
+          token: string
+        }) => Awaitable<VerificationToken | null>
+      }
+    : {})
+
+export interface DefaultAdapter {
+  createUser: (user: Omit<AdapterUser, "id">) => Awaitable<AdapterUser>
+  getUser: (id: string) => Awaitable<AdapterUser | null>
+  getUserByEmail: (email: string) => Awaitable<AdapterUser | null>
   /** Using the provider id and the id of the user for a specific account, get the user. */
-  getUserByAccount?: (
+  getUserByAccount: (
     providerAccountId: Pick<AdapterAccount, "provider" | "providerAccountId">
   ) => Awaitable<AdapterUser | null>
-  updateUser?: (
-    user: Partial<AdapterUser> & Pick<AdapterUser, "id">
-  ) => Awaitable<AdapterUser>
+  updateUser: (user: Partial<AdapterUser> & Pick<AdapterUser, "id">) => Awaitable<AdapterUser>
   /** @todo Implement */
   deleteUser?: (
     userId: string
   ) => Promise<void> | Awaitable<AdapterUser | null | undefined>
-  linkAccount?:
-    | FutureAdapter["linkAccount"]
-    | ((
-        account: AdapterAccount,
-      ) => Promise<void> | Awaitable<AdapterAccount | null | undefined>)
+  linkAccount: (
+    account: AdapterAccount
+  ) => Promise<void> | Awaitable<AdapterAccount | null | undefined>
   /** @todo Implement */
-  unlinkAccount?:
-    | FutureAdapter["unlinkAccount"]
-    | ((
-        providerAccountId: Pick<
-          AdapterAccount,
-          "provider" | "providerAccountId"
-        >,
-      ) => Promise<void> | Awaitable<AdapterAccount | undefined>)
+  unlinkAccount?: (
+    providerAccountId: Pick<AdapterAccount, "provider" | "providerAccountId">
+  ) => Promise<void> | Awaitable<AdapterAccount | undefined>
   /** Creates a session for the user and returns it. */
-  createSession?: (session: {
+  createSession: (session: {
     sessionToken: string
     userId: string
     expires: Date
   }) => Awaitable<AdapterSession>
-  getSessionAndUser?: (
+  getSessionAndUser: (
     sessionToken: string
   ) => Awaitable<{ session: AdapterSession; user: AdapterUser } | null>
-  updateSession?: (
+  updateSession: (
     session: Partial<AdapterSession> & Pick<AdapterSession, "sessionToken">
   ) => Awaitable<AdapterSession | null | undefined>
   /**
@@ -108,7 +113,7 @@ export interface Adapter {
    * It is preferred that this method also returns the session
    * that is being deleted for logging purposes.
    */
-  deleteSession?: (
+  deleteSession: (
     sessionToken: string
   ) => Promise<void> | Awaitable<AdapterSession | null | undefined>
   createVerificationToken?: (
