@@ -1,6 +1,6 @@
 {
   "name": "@sidebase/fork-authjs",
-  "version": "4.24.14-next.1",
+  "version": "4.24.14-next.2",
   "description": "Authentication for Nuxt",
   "homepage": "https://authjs.dev",
   "repository": "https://github.com/sidebase/fork-authjs.git",
