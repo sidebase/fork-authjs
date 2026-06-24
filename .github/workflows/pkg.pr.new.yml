@@ -8,13 +8,12 @@ on:
   pull_request:
 
 env:
-  # NODE_VER: 24.14
-  NODE_VER: 18.20
+  NODE_VER: 24.14
   WORKING_DIR: packages/next-auth
 
 defaults:
   run:
-    working-directory: ${{ env.WORKING_DIR }}
+    working-directory: packages/next-auth
 
 jobs:
   build:
@@ -27,20 +26,20 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-          # cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+          cache_dependency_path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Use Node.js ${{ env.NODE_VER }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: ${{ env.NODE_VER }}
           cache: pnpm
-          # cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
+          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
-      - name: Install deps
-        run: pnpm i
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
 
-      # - name: Build and pack
-      #   run: pnpm prepack
+      - name: Build and pack
+        run: pnpm build
 
-      # - name: Publish package preview
-      #   run: pnpx pkg-pr-new publish --compact
+      - name: Publish package preview
+        run: pnpm exec pkg-pr-new publish --compact --packageManager=npm,pnpm,yarn
