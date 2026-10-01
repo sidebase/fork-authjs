@@ -1,4 +1,5 @@
-import renderToString from "preact-render-to-string"
+import type { VNode } from "vue"
+import { renderToString } from "vue/server-renderer"
 import SigninPage from "./signin"
 import SignoutPage from "./signout"
 import VerifyRequestPage from "./verify-request"
@@ -27,19 +28,27 @@ type RenderPageParams = {
 export default function renderPage(params: RenderPageParams) {
   const { url, theme, query, cookies } = params
 
-  function send({ html, title, status }: any): ResponseInternal {
+  async function send(
+    { html, title, status }: {
+      html: VNode
+      title: string
+      status?: number
+    }
+  ): Promise<ResponseInternal<string>> {
+    const body = await renderToString(html)
+
     return {
       cookies,
       status,
       headers: [{ key: "Content-Type", value: "text/html" }],
       body: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>${css()}</style><title>${title}</title></head><body class="__next-auth-theme-${
         theme?.colorScheme ?? "auto"
-      }"><div class="page">${renderToString(html)}</div></body></html>`,
+      }"><div class="page">${body}</div></body></html>`,
     }
   }
 
   return {
-    signin(props?: any) {
+    signin(props?: any): Promise<ResponseInternal> {
       return send({
         html: SigninPage({
           csrfToken: params.csrfToken,
@@ -52,7 +61,7 @@ export default function renderPage(params: RenderPageParams) {
         title: "Sign In",
       })
     },
-    signout(props?: any) {
+    signout(props?: any): Promise<ResponseInternal> {
       return send({
         html: SignoutPage({
           csrfToken: params.csrfToken,
@@ -63,13 +72,13 @@ export default function renderPage(params: RenderPageParams) {
         title: "Sign Out",
       })
     },
-    verifyRequest(props?: any) {
+    verifyRequest(props?: any): Promise<ResponseInternal> {
       return send({
         html: VerifyRequestPage({ url, theme, ...props }),
         title: "Verify Request",
       })
     },
-    error(props?: { error?: ErrorType }) {
+    error(props?: { error?: ErrorType }): Promise<ResponseInternal> {
       return send({
         ...ErrorPage({ url, theme, ...props }),
         title: "Error",
