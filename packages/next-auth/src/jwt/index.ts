@@ -41,7 +41,7 @@ export interface GetTokenParams<R extends boolean = false> {
   /** The request containing the JWT either in the cookies or in the `Authorization` header. */
   req: {
     cookies: Record<string, string>
-    headers: IncomingHttpHeaders
+    headers: Headers | IncomingHttpHeaders
   }
   /**
    * Use secure prefix for cookie name, unless URL in `NEXTAUTH_URL` is http://
@@ -155,7 +155,7 @@ function normalizeUint8Array(input: string | Buffer, label: string) {
         return new TextEncoder().encode(input)
     }
     if (!(input instanceof Uint8Array)) {
-        throw new TypeError(`"${label}"" must be an instance of Uint8Array or a string`)
+        throw new TypeError(`"${label}" must be an instance of Uint8Array or a string`)
     }
     return input
 }

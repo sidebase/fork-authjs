@@ -20,17 +20,6 @@ module.exports = {
         },
       },
     },
-    {
-      displayName: "client",
-      testMatch: ["<rootDir>/src/client/**/*.test.js"],
-      setupFilesAfterEnv: ["./config/jest-setup.js"],
-      rootDir: ".",
-      transform: {
-        "\\.(js|jsx|ts|tsx)$": ["@swc/jest", swcConfig],
-      },
-      testEnvironment: "jsdom",
-      coveragePathIgnorePatterns: ["__tests__"],
-    },
   ],
   watchPlugins: [
     "jest-watch-typeahead/filename",

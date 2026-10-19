@@ -1,35 +1,18 @@
-import { h, type VNode } from "vue"
+import { h } from "vue"
 import type { Theme } from "../.."
 import type { InternalUrl } from "../../utils/parse-url"
+import { renderThemeStyle } from "./theme-style"
 
 interface VerifyRequestPageProps {
   url: InternalUrl
   theme: Theme
 }
 
-function renderThemeStyle(theme: Theme): VNode[] {
-  const nodes: VNode[] = []
-
-  if (theme.brandColor) {
-    nodes.push(
-      h("style", {
-        innerHTML: `
-:root {
-  --brand-color: ${theme.brandColor};
-}
-        `.trim(),
-      })
-    )
-  }
-
-  return nodes
-}
-
 export default function VerifyRequestPage(props: VerifyRequestPageProps) {
   const { url, theme } = props
 
   return h("div", { class: "verify-request" }, [
-    ...renderThemeStyle(theme),
+    ...renderThemeStyle(theme, /* buttonText = */ false),
 
     h("div", { class: "card" }, [
       theme.logo

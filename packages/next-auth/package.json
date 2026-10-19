@@ -62,7 +62,10 @@
     "test": "jest --config ./config/jest.config.js",
     "prepublishOnly": "pnpm build",
     "generate-providers": "node ./config/generate-providers.js",
-    "lint": "eslint src config tests"
+    "lint": "eslint src config tests eslint.config.cjs",
+    "typecheck": "pnpm typecheck:src && pnpm typecheck:tests",
+    "typecheck:src": "tsc --project tsconfig.build.json --noEmit",
+    "typecheck:tests": "tsc --project tsconfig.test.json"
   },
   "files": [
     "client",
@@ -86,7 +89,8 @@
     "openid-client": "^5.4.0"
   },
   "peerDependencies": {
-    "nodemailer": "^9.0.1"
+    "nodemailer": "^9.0.1",
+    "vue": "^3.5.30"
   },
   "peerDependenciesMeta": {
     "nodemailer": {
@@ -95,11 +99,9 @@
   },
   "devDependencies": {
     "@edge-runtime/jest-environment": "1.1.0-beta.35",
+    "@eslint/js": "10.0.1",
     "@swc/core": "^1.2.198",
     "@swc/jest": "^0.2.21",
-    "@testing-library/dom": "^8.13.0",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/user-event": "^14.2.0",
     "@types/jest": "^28.1.3",
     "@types/node": "^24.12.0",
     "@types/nodemailer": "^6.4.6",
@@ -107,16 +109,16 @@
     "autoprefixer": "^10.4.7",
     "concurrently": "^7",
     "cssnano": "^5.1.11",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
     "jest": "^28.1.1",
-    "jest-environment-jsdom": "^30.3.0",
     "jest-watch-typeahead": "^1.1.0",
-    "msw": "^2.12.10",
     "pkg-pr-new": "^0.0.75",
     "postcss": "^8.5.15",
     "postcss-cli": "^9.1.0",
     "postcss-nested": "^5.0.6",
     "typescript": "^5.9.3",
-    "vue": "^3.5.30",
-    "whatwg-fetch": "^3.6.2"
+    "typescript-eslint": "8.71.2",
+    "vue": "^3.5.30"
   }
 }

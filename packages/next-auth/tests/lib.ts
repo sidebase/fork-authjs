@@ -20,7 +20,6 @@ export async function handler(
   options: AuthOptions,
   { prod, path, params, requestInit }: HandlerOptions
 ) {
-  // @ts-expect-error
   if (prod) process.env.NODE_ENV = "production"
 
   const url = new URL(
@@ -34,7 +33,6 @@ export async function handler(
     req,
     options: { secret: "secret", ...options, logger },
   })
-  // @ts-expect-error
   if (prod) process.env.NODE_ENV = "test"
 
   return {

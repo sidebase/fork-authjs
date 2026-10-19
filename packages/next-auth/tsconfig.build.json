@@ -10,7 +10,7 @@
     "module": "preserve",
     "target": "esnext",
     "moduleResolution": "bundler",
-    "allowJs": false,
+    "allowJs": true,
     "isolatedModules": false,
     "sourceMap": false,
     "noEmitOnError": true

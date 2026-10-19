@@ -132,7 +132,7 @@ export class SessionStore {
     option: CookieOption,
     req: Partial<{
       cookies: Partial<Record<string, string>> | Map<string, string>
-      headers: IncomingHttpHeaders
+      headers: Headers | IncomingHttpHeaders
     }>,
     logger: LoggerInstance | Console
   ) {
