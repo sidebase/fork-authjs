@@ -1,6 +1,7 @@
 import { h, type VNodeChild } from "vue"
 import type { Theme } from "../.."
 import type { InternalUrl } from "../../utils/parse-url"
+import { renderThemeStyle } from "./theme-style"
 
 /**
  * The following errors are passed as error query parameters to the default or overridden error page.
@@ -98,15 +99,7 @@ export default function ErrorPage(props: ErrorProps) {
   return {
     status,
     html: h("div", { class: "error" }, [
-      theme?.brandColor
-        ? h("style", {
-            innerHTML: `
-:root {
-  --brand-color: ${theme.brandColor};
-}
-          `.trim(),
-          })
-        : null,
+      ...renderThemeStyle(theme, /* buttonText = */ false),
 
       h("div", { class: "card" }, [
         theme?.logo

@@ -1,6 +1,7 @@
-import { h, type VNode } from "vue"
+import { h } from "vue"
 import type { Theme } from "../.."
 import type { InternalUrl } from "../../utils/parse-url"
+import { renderThemeStyle } from "./theme-style"
 
 export interface SignoutProps {
   url: InternalUrl
@@ -8,41 +9,11 @@ export interface SignoutProps {
   theme: Theme
 }
 
-function renderThemeStyle(theme: Theme): VNode[] {
-  const nodes: VNode[] = []
-
-  if (theme.brandColor) {
-    nodes.push(
-      h("style", {
-        innerHTML: `
-:root {
-  --brand-color: ${theme.brandColor};
-}
-        `.trim(),
-      })
-    )
-  }
-
-  if (theme.buttonText) {
-    nodes.push(
-      h("style", {
-        innerHTML: `
-:root {
-  --button-text-color: ${theme.buttonText};
-}
-        `.trim(),
-      })
-    )
-  }
-
-  return nodes
-}
-
 export default function SignoutPage(props: SignoutProps) {
   const { url, csrfToken, theme } = props
 
   return h("div", { class: "signout" }, [
-    ...renderThemeStyle(theme),
+    ...renderThemeStyle(theme, /* buttonText = */ true),
 
     h("div", { class: "card" }, [
       theme.logo

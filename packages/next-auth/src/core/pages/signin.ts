@@ -1,5 +1,6 @@
-import { h, type CSSProperties, type VNode, type VNodeChild } from "vue"
+import { h, type CSSProperties, type VNodeChild } from "vue"
 import type { InternalProvider, Theme } from "../types"
+import { renderThemeStyle } from "./theme-style"
 
 /**
  * The following errors are passed as error query parameters to the default or overridden sign-in page.
@@ -54,36 +55,6 @@ function hexToRgba(hex?: string, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
-function renderThemeStyle(theme: Theme): VNode[] {
-  const nodes: VNode[] = []
-
-  if (theme.brandColor) {
-    nodes.push(
-      h("style", {
-        innerHTML: `
-:root {
-  --brand-color: ${theme.brandColor};
-}
-        `.trim(),
-      })
-    )
-  }
-
-  if (theme.buttonText) {
-    nodes.push(
-      h("style", {
-        innerHTML: `
-:root {
-  --button-text-color: ${theme.buttonText};
-}
-        `.trim(),
-      })
-    )
-  }
-
-  return nodes
-}
-
 export default function SigninPage(props: SignInServerPageParams) {
   const {
     csrfToken,
@@ -127,7 +98,7 @@ export default function SigninPage(props: SignInServerPageParams) {
   const providerLogoPath = "https://authjs.dev/img/providers"
 
   return h("div", { class: "signin" }, [
-    ...renderThemeStyle(theme),
+    ...renderThemeStyle(theme, /* buttonText = */ true),
 
     h("div", { class: "card" }, [
       theme.logo

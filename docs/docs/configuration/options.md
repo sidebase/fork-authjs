@@ -393,6 +393,8 @@ theme: {
 }
 ```
 
+The `brandColor` and `buttonText` values are rendered as escaped text inside a `<style>` element. HTML markup in a color value is not interpreted; use CSS color values (such as the documented hex codes). Data URIs for images belong in `logo`, not in these color fields.
+
 ---
 
 ## Advanced Options
