@@ -12,6 +12,6 @@ const pathToCss = path.join(__dirname, "../css/index.css")
 const css = fs.readFileSync(pathToCss, "utf8")
 const cssWithEscapedQuotes = css.replace(/"/gm, '\\"')
 
-const js = `module.exports = function() { return "${cssWithEscapedQuotes}" }`
+const js = `export default function css() { return "${cssWithEscapedQuotes}" }`
 const pathToCssJs = path.join(__dirname, "../css/index.js")
 fs.writeFileSync(pathToCssJs, js)

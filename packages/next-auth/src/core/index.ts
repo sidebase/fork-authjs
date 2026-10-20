@@ -10,13 +10,14 @@ import type { AuthAction, AuthOptions } from "./types"
 import type { Cookie } from "./lib/cookie"
 import type { ErrorType } from "./pages/error"
 import { parse as parseCookie } from "cookie"
+import { IncomingHttpHeaders } from "node:http"
 
 export interface RequestInternal {
   /** @default "http://localhost:3000" */
   origin?: string
   method?: string
   cookies?: Partial<Record<string, string>>
-  headers?: Record<string, any>
+  headers?: IncomingHttpHeaders
   query?: Record<string, any>
   body?: Record<string, any>
   action: AuthAction
@@ -156,9 +157,10 @@ export async function AuthHandler<
   if (method === "GET") {
     const render = renderPage({ ...options, query: req.query, cookies })
     const { pages } = options
+
     switch (action) {
       case "providers":
-        return (await routes.providers(options.providers)) as any
+        return routes.providers(options.providers) as ResponseInternal<Body>
       case "session": {
         const session = await routes.session({ options, sessionStore })
         if (session.cookies) cookies.push(...session.cookies)

@@ -47,7 +47,7 @@ beforeEach(() => {
 
 describe("PKCE", () => {
   it("sets a code challenge, code challenge method, and cookie", async () => {
-    const cookies = []
+    const cookies: Cookie[] = []
     const params: AuthorizationParameters = {}
     await checks.pkce.create(options, cookies, params)
 
@@ -58,7 +58,7 @@ describe("PKCE", () => {
 
   it("does not set PKCE values when unsupported", async () => {
     options.provider.checks = ["state"]
-    const cookies = []
+    const cookies: Cookie[] = []
     const params: AuthorizationParameters = {}
     await checks.pkce.create(options, cookies, params)
 
@@ -97,7 +97,7 @@ describe("PKCE", () => {
 
 describe("state", () => {
   it("returns a state, and cookie", async () => {
-    const cookies = []
+    const cookies: Cookie[] = []
     const params: AuthorizationParameters = {}
     await checks.state.create(options, cookies, params)
 
@@ -107,7 +107,7 @@ describe("state", () => {
 
   it("does not set state when unsupported", async () => {
     options.provider.checks = ["pkce"]
-    const cookies = []
+    const cookies: Cookie[] = []
     const params: AuthorizationParameters = {}
     await checks.state.create(options, cookies, params)
 

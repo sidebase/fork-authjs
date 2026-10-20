@@ -40,14 +40,17 @@ it("Send e-mail to the only address correctly", async () => {
   )
 })
 
-it("Send e-mail to first address only", async () => {
+it("Reject an address list containing multiple `@` symbols", async () => {
   const { secret, csrf } = await createCSRF()
   const sendVerificationRequest = jest.fn()
   const signIn = jest.fn(() => true)
 
-  const firstEmail = "email@email.com"
-  const email = `${firstEmail},email@email2.com`
-  const { res } = await handler(
+  // Two real `@` symbols (one per address) must be rejected rather than
+  // silently delivering the magic link to the first address, which would let
+  // an attacker smuggle a second recipient past the single-`@` check.
+  const email = "email@email.com,email@email2.com"
+  const error = new Error("Invalid email address format.")
+  const { res, log } = await handler(
     {
       adapter: mockAdapter(),
       providers: [EmailProvider({ sendVerificationRequest })],
@@ -64,20 +67,17 @@ it("Send e-mail to first address only", async () => {
     }
   )
 
+  expect(signIn).toBeCalledTimes(0)
+  expect(sendVerificationRequest).toBeCalledTimes(0)
   expect(res.redirect).toBe(
-    "http://localhost:3000/api/auth/verify-request?provider=email&type=email"
+    "http://localhost:3000/api/auth/error?error=EmailSignin"
   )
 
-  expect(signIn).toBeCalledTimes(1)
-  expect(signIn).toHaveBeenCalledWith(
-    expect.objectContaining({
-      user: expect.objectContaining({ email: firstEmail }),
-    })
-  )
-
-  expect(sendVerificationRequest).toHaveBeenCalledWith(
-    expect.objectContaining({ identifier: firstEmail })
-  )
+  // @ts-expect-error
+  expect(log.error.mock.calls[0]).toEqual([
+    "SIGNIN_EMAIL_ERROR",
+    { error, providerId: "email" },
+  ])
 })
 
 it("Send e-mail to address with first domain", async () => {
@@ -117,6 +117,43 @@ it("Send e-mail to address with first domain", async () => {
 
   expect(sendVerificationRequest).toHaveBeenCalledWith(
     expect.objectContaining({ identifier: firstEmail })
+  )
+})
+
+// Regression test for GHSA-7rqj-j65f-68wh:
+// U+FF20 (FULLWIDTH COMMERCIAL AT) is a homoglyph of `@` that normalizes to an
+// ASCII `@` under NFKC. The normalizer must canonicalize before validation so
+// the address cannot smuggle a second `@` past the single-`@` check and have a
+// downstream mailer deliver the magic link to an attacker-controlled address.
+it("Reject email with a Unicode homoglyph of @ (GHSA-7rqj-j65f-68wh)", async () => {
+  const { secret, csrf } = await createCSRF()
+  const sendVerificationRequest = jest.fn()
+  const signIn = jest.fn(() => true)
+
+  const { res } = await handler(
+    {
+      adapter: mockAdapter(),
+      providers: [EmailProvider({ sendVerificationRequest })],
+      callbacks: { signIn },
+      secret,
+    },
+    {
+      path: "signin/email",
+      requestInit: {
+        method: "POST",
+        headers: { cookie: csrf.cookie },
+        body: JSON.stringify({
+          email: "attacker@evil.com＠victim.company.com",
+          csrfToken: csrf.value,
+        }),
+      },
+    }
+  )
+
+  expect(signIn).toBeCalledTimes(0)
+  expect(sendVerificationRequest).toBeCalledTimes(0)
+  expect(res.redirect).toBe(
+    "http://localhost:3000/api/auth/error?error=EmailSignin"
   )
 })
 

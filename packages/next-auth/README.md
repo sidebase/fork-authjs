@@ -1,3 +1,23 @@
+> [!WARNING]
+> This package is a Nuxt-focused fork of `next-auth` for use with `@sidebase/nuxt-auth`.
+> It is not intended to be a general Next.js drop-in replacement.
+>
+> Key differences from upstream `next-auth`:
+>
+> - The package is published as `@sidebase/fork-authjs` and is meant to be installed as a `next-auth` alias, for example `next-auth@npm:@sidebase/fork-authjs`.
+> - Removed Next.js and React entrypoints such as `next-auth/react`, `next-auth/next`, and `next-auth/middleware`.
+> - Provider imports should use the default export directly, for example `GithubProvider(...)`, not `GithubProvider.default(...)`.
+> - This fork targets Nuxt/Vite bundler usage through `@sidebase/nuxt-auth`; native Node ESM imports are not the primary compatibility target.
+> - Nodemailer support is limited to patched peer versions declared by this package.
+>
+> Install as a `next-auth` alias:
+>
+> ```sh
+> npm install next-auth@npm:@sidebase/fork-authjs
+> pnpm add next-auth@npm:@sidebase/fork-authjs
+> yarn add next-auth@npm:@sidebase/fork-authjs
+> ```
+
 <p align="center">
    <br/>
    <a href="https://next-auth.js.org" target="_blank"><img width="150px" src="https://next-auth.js.org/img/logo/logo-sm.png" /></a>

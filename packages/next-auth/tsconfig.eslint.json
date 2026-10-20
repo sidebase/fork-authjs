@@ -1,8 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["@types/jest"],
-    "typeRoots": ["./node_modules/@types"]
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "declaration": false,
+    "declarationMap": false,
+    "rootDir": ".",
+    "types": ["node", "jest"]
   },
   "exclude": ["./coverage", "./*.js", "./*.d.ts"]
 }
